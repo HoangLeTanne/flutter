@@ -17,7 +17,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
   int? _filterPriority;
   String _searchQuery = '';
   final _searchController = TextEditingController();
-  String _sortBy = 'priority'; // Sắp xếp theo ưu tiên hoặc thời gian
+  String _sortBy = 'priority';
 
   @override
   void initState() {
@@ -48,59 +48,70 @@ class _NoteListScreenState extends State<NoteListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Danh sách ghi chú'),
+        title: const Text('📒 Danh sách ghi chú'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _refreshNotes,
           ),
           PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
             onSelected: (value) {
               setState(() {
-                if (value == 'grid') {
-                  _isGridView = true;
-                } else if (value == 'list') {
-                  _isGridView = false;
-                } else if (value == 'priority') {
-                  _sortBy = 'priority';
-                } else if (value == 'time') {
-                  _sortBy = 'time';
-                } else if (value == 'filter_low') {
-                  _filterPriority = 1;
-                } else if (value == 'filter_medium') {
-                  _filterPriority = 2;
-                } else if (value == 'filter_high') {
-                  _filterPriority = 3;
-                } else if (value == 'filter_none') {
-                  _filterPriority = null;
+                switch (value) {
+                  case 'grid':
+                    _isGridView = true;
+                    break;
+                  case 'list':
+                    _isGridView = false;
+                    break;
+                  case 'priority':
+                  case 'time':
+                    _sortBy = value;
+                    break;
+                  case 'filter_low':
+                    _filterPriority = 1;
+                    break;
+                  case 'filter_medium':
+                    _filterPriority = 2;
+                    break;
+                  case 'filter_high':
+                    _filterPriority = 3;
+                    break;
+                  case 'filter_none':
+                    _filterPriority = null;
+                    break;
                 }
                 _refreshNotes();
               });
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'grid', child: Text('Chế độ Grid')),
-              const PopupMenuItem(value: 'list', child: Text('Chế độ List')),
-              const PopupMenuItem(value: 'priority', child: Text('Sắp xếp theo ưu tiên')),
-              const PopupMenuItem(value: 'time', child: Text('Sắp xếp theo thời gian')),
-              const PopupMenuItem(value: 'filter_low', child: Text('Lọc: Ưu tiên thấp')),
-              const PopupMenuItem(value: 'filter_medium', child: Text('Lọc: Ưu tiên trung bình')),
-              const PopupMenuItem(value: 'filter_high', child: Text('Lọc: Ưu tiên cao')),
-              const PopupMenuItem(value: 'filter_none', child: Text('Bỏ lọc')),
+              const PopupMenuItem(value: 'grid', child: ListTile(leading: Icon(Icons.grid_view), title: Text('Chế độ Grid'))),
+              const PopupMenuItem(value: 'list', child: ListTile(leading: Icon(Icons.view_list), title: Text('Chế độ List'))),
+              const PopupMenuItem(value: 'priority', child: ListTile(leading: Icon(Icons.low_priority), title: Text('Sắp xếp theo ưu tiên'))),
+              const PopupMenuItem(value: 'time', child: ListTile(leading: Icon(Icons.access_time), title: Text('Sắp xếp theo thời gian'))),
+              const PopupMenuItem(value: 'filter_low', child: ListTile(leading: Icon(Icons.filter_1), title: Text('Lọc: Ưu tiên thấp'))),
+              const PopupMenuItem(value: 'filter_medium', child: ListTile(leading: Icon(Icons.filter_2), title: Text('Lọc: Ưu tiên trung bình'))),
+              const PopupMenuItem(value: 'filter_high', child: ListTile(leading: Icon(Icons.filter_3), title: Text('Lọc: Ưu tiên cao'))),
+              const PopupMenuItem(value: 'filter_none', child: ListTile(leading: Icon(Icons.filter_none), title: Text('Bỏ lọc'))),
             ],
           ),
         ],
       ),
+
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Tìm kiếm ghi chú',
-                prefixIcon: Icon(Icons.search),
-                border: const OutlineInputBorder(),
+                labelText: ' Tìm kiếm ghi chú',
+                filled: true,
+                fillColor: Colors.white,
+                prefixIcon: const Icon(Icons.search),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.clear),
                   onPressed: () {
@@ -111,6 +122,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
                     });
                   },
                 ),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onChanged: (value) {
                 setState(() {
@@ -120,6 +132,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
               },
             ),
           ),
+          const SizedBox(height: 8),
           Expanded(
             child: FutureBuilder<List<Note>>(
               future: _notesFuture,
@@ -129,14 +142,17 @@ class _NoteListScreenState extends State<NoteListScreen> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Lỗi: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('Không có ghi chú nào'));
+                  return const Center(child: Text('Không có ghi chú nào.'));
                 } else {
                   final notes = _sortNotes(snapshot.data!);
                   return _isGridView
                       ? GridView.builder(
+                    padding: const EdgeInsets.all(12),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 1,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 0.9,
                     ),
                     itemCount: notes.length,
                     itemBuilder: (context, index) {
@@ -148,27 +164,22 @@ class _NoteListScreenState extends State<NoteListScreen> {
                           await NoteDatabaseHelper.instance.deleteNote(note.id!);
                           _refreshNotes();
                         },
-                        onEdit: (updatedNote) async {
+                        onEdit: (updatedNote) {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => NoteForm(note: updatedNote),
-                            ),
-                          ).then((result) {
-                            if (result != null) {
-                              _refreshNotes();
-                            }
-                          });
+                            MaterialPageRoute(builder: (context) => NoteForm(note: updatedNote)),
+                          ).then((value) => _refreshNotes());
                         },
                         onToggleComplete: (note) async {
-                          final updatedNote = note.copyWith(isCompleted: !note.isCompleted);
-                          await NoteDatabaseHelper.instance.updateNote(updatedNote);
+                          final updated = note.copyWith(isCompleted: !note.isCompleted);
+                          await NoteDatabaseHelper.instance.updateNote(updated);
                           _refreshNotes();
                         },
                       );
                     },
                   )
                       : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     itemCount: notes.length,
                     itemBuilder: (context, index) {
                       final note = notes[index];
@@ -179,21 +190,15 @@ class _NoteListScreenState extends State<NoteListScreen> {
                           await NoteDatabaseHelper.instance.deleteNote(note.id!);
                           _refreshNotes();
                         },
-                        onEdit: (updatedNote) async {
+                        onEdit: (updatedNote) {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => NoteForm(note: updatedNote),
-                            ),
-                          ).then((result) {
-                            if (result != null) {
-                              _refreshNotes();
-                            }
-                          });
+                            MaterialPageRoute(builder: (context) => NoteForm(note: updatedNote)),
+                          ).then((value) => _refreshNotes());
                         },
                         onToggleComplete: (note) async {
-                          final updatedNote = note.copyWith(isCompleted: !note.isCompleted);
-                          await NoteDatabaseHelper.instance.updateNote(updatedNote);
+                          final updated = note.copyWith(isCompleted: !note.isCompleted);
+                          await NoteDatabaseHelper.instance.updateNote(updated);
                           _refreshNotes();
                         },
                       );
@@ -205,8 +210,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final newNote = await Navigator.push(
             context,
@@ -217,6 +221,8 @@ class _NoteListScreenState extends State<NoteListScreen> {
             _refreshNotes();
           }
         },
+        icon: const Icon(Icons.add),
+        label: const Text('Thêm ghi chú'),
       ),
     );
   }
