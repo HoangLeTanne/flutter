@@ -4,7 +4,7 @@ import 'package:app_02_1/notesApp/model/Note.dart';
 import 'package:app_02_1/notesApp/view/NoteForm.dart';
 
 class NoteDetailScreen extends StatelessWidget {
-  final Note note;
+  final Note note; // Lưu trữ thông tin của ghi chú cần hiển thị
 
   const NoteDetailScreen({Key? key, required this.note}) : super(key: key);
 
@@ -12,52 +12,52 @@ class NoteDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chi tiết ghi chú'),
+        title: const Text('Chi tiết ghi chú'), // Tiêu đề của AppBar
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: const Icon(Icons.edit), // Nút chỉnh sửa
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => NoteForm(note: note),
+                  builder: (context) => NoteForm(note: note), // Chuyển đến màn hình chỉnh sửa ghi chú
                 ),
               );
             },
           ),
         ],
       ),
-      body: SingleChildScrollView(
+      body: SingleChildScrollView( // Scroll cho phép cuộn nếu nội dung dài
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start, // Căn lề trái cho các phần tử
           children: [
-            // Title
+            // Tiêu đề của ghi chú
             Text(
               note.title,
               style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                fontSize: 24, // Kích thước chữ lớn
+                fontWeight: FontWeight.bold, // Chữ in đậm
+                color: Colors.black87, // Màu chữ
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 8), // Khoảng cách giữa các phần tử
 
-            // Priority
+            // Hiển thị mức độ ưu tiên
             Text(
               'Ưu tiên: ${note.priority == 3 ? "Cao" : note.priority == 2 ? "Trung bình" : "Thấp"}',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: note.priority == 3
-                    ? Colors.red
+                    ? Colors.red // Màu đỏ cho ưu tiên cao
                     : note.priority == 2
-                    ? Colors.yellow.shade800
-                    : Colors.green,
+                    ? Colors.yellow.shade800 // Màu vàng cho ưu tiên trung bình
+                    : Colors.green, // Màu xanh cho ưu tiên thấp
               ),
             ),
             const SizedBox(height: 8),
 
-            // Date Created and Modified
+            // Hiển thị ngày tạo và ngày sửa đổi ghi chú
             Text(
               'Tạo: ${DateFormat('dd/MM/yyyy HH:mm').format(note.createdAt)}',
               style: const TextStyle(color: Colors.grey),
@@ -69,17 +69,17 @@ class NoteDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Tags
+            // Hiển thị các thẻ (tags) của ghi chú
             if (note.tags != null && note.tags!.isNotEmpty)
               Wrap(
-                spacing: 8,
+                spacing: 8, // Khoảng cách giữa các thẻ
                 children: note.tags!
                     .map(
                       (tag) => Chip(
-                    label: Text(tag),
-                    backgroundColor: Colors.blue.shade100,
+                    label: Text(tag), // Nội dung thẻ
+                    backgroundColor: Colors.blue.shade100, // Màu nền của thẻ
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10), // Bo góc của thẻ
                     ),
                   ),
                 )
@@ -87,10 +87,10 @@ class NoteDetailScreen extends StatelessWidget {
               ),
             const SizedBox(height: 16),
 
-            // Content
+            // Hiển thị nội dung ghi chú
             Text(
               note.content,
-              style: const TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16), // Kích thước chữ cho nội dung
             ),
           ],
         ),
@@ -98,3 +98,4 @@ class NoteDetailScreen extends StatelessWidget {
     );
   }
 }
+

@@ -5,10 +5,10 @@ import 'package:app_02_1/notesApp/view/NoteDetailScreen.dart';
 
 class NoteItem extends StatelessWidget {
   final Note note;
-  final VoidCallback onDelete;
-  final Function(Note) onEdit;
-  final Function(Note) onToggleComplete;
-  final bool isGridView;
+  final VoidCallback onDelete; // Hàm xóa ghi chú
+  final Function(Note) onEdit; // Hàm chỉnh sửa ghi chú
+  final Function(Note) onToggleComplete; // Hàm thay đổi trạng thái hoàn thành
+  final bool isGridView; // Kiểm tra xem có đang ở chế độ Grid không
 
   const NoteItem({
     Key? key,
@@ -19,21 +19,23 @@ class NoteItem extends StatelessWidget {
     required this.isGridView,
   }) : super(key: key);
 
+  // Hàm xác định màu sắc của ghi chú dựa trên mức độ ưu tiên
   Color _getPriorityColor() {
     switch (note.priority) {
       case 3:
-        return Colors.red.shade300;
+        return Colors.red.shade300; // Ưu tiên cao -> màu đỏ
       case 2:
-        return Colors.yellow.shade300;
+        return Colors.yellow.shade300; // Ưu tiên trung bình -> màu vàng
       case 1:
       default:
-        return Colors.green.shade300;
+        return Colors.green.shade300; // Ưu tiên thấp -> màu xanh
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      // Khi nhấn vào ghi chú, chuyển đến màn hình chi tiết ghi chú
       onTap: () {
         Navigator.push(
           context,
@@ -43,9 +45,10 @@ class NoteItem extends StatelessWidget {
         );
       },
       child: Card(
+        // Nếu ghi chú có màu sắc, sử dụng màu đó; nếu không, sử dụng màu theo ưu tiên
         color: note.color != null ? Color(int.parse('0xFF${note.color!.replaceFirst('#', '')}')) : _getPriorityColor(),
         margin: const EdgeInsets.all(8),
-        child: isGridView
+        child: isGridView // Kiểm tra nếu đang ở chế độ Grid hay List
             ? Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -56,7 +59,7 @@ class NoteItem extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  decoration: note.isCompleted ? TextDecoration.lineThrough : null,
+                  decoration: note.isCompleted ? TextDecoration.lineThrough : null, // Gạch ngang nếu ghi chú đã hoàn thành
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -73,7 +76,7 @@ class NoteItem extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                'Cập nhật: ${DateFormat('dd/MM/yyyy HH:mm').format(note.modifiedAt)}',
+                'Cập nhật: ${DateFormat('dd/MM/yyyy HH:mm').format(note.modifiedAt)}', // Định dạng ngày giờ cập nhật
                 style: const TextStyle(fontSize: 12, color: Colors.black54),
               ),
             ),
@@ -90,15 +93,16 @@ class NoteItem extends StatelessWidget {
               children: [
                 IconButton(
                   icon: Icon(note.isCompleted ? Icons.check_circle : Icons.check_circle_outline),
-                  onPressed: () => onToggleComplete(note),
+                  onPressed: () => onToggleComplete(note), // Thay đổi trạng thái hoàn thành
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
-                  onPressed: () => onEdit(note),
+                  onPressed: () => onEdit(note), // Mở màn hình chỉnh sửa ghi chú
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () {
+                    // Hiển thị hộp thoại xác nhận xóa
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
@@ -112,7 +116,7 @@ class NoteItem extends StatelessWidget {
                           TextButton(
                             child: const Text('Xóa'),
                             onPressed: () {
-                              onDelete();
+                              onDelete(); // Xóa ghi chú khi xác nhận
                               Navigator.pop(context);
                             },
                           ),
@@ -130,7 +134,7 @@ class NoteItem extends StatelessWidget {
             note.title,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              decoration: note.isCompleted ? TextDecoration.lineThrough : null,
+              decoration: note.isCompleted ? TextDecoration.lineThrough : null, // Gạch ngang nếu hoàn thành
             ),
           ),
           subtitle: Column(
@@ -142,7 +146,7 @@ class NoteItem extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                'Cập nhật: ${DateFormat('dd/MM/yyyy HH:mm').format(note.modifiedAt)}',
+                'Cập nhật: ${DateFormat('dd/MM/yyyy HH:mm').format(note.modifiedAt)}', // Định dạng ngày giờ cập nhật
                 style: const TextStyle(fontSize: 12, color: Colors.black54),
               ),
               if (note.tags != null && note.tags!.isNotEmpty)
@@ -156,16 +160,13 @@ class NoteItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: Icon(note.isCompleted ? Icons.check_circle : Icons.check_circle_outline),
-                onPressed: () => onToggleComplete(note),
-              ),
-              IconButton(
                 icon: const Icon(Icons.edit, color: Colors.blue),
-                onPressed: () => onEdit(note),
+                onPressed: () => onEdit(note), // Chỉnh sửa ghi chú
               ),
               IconButton(
                 icon: const Icon(Icons.delete, color: Colors.red),
                 onPressed: () {
+                  // Hiển thị hộp thoại xác nhận xóa
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
@@ -179,7 +180,7 @@ class NoteItem extends StatelessWidget {
                         TextButton(
                           child: const Text('Xóa'),
                           onPressed: () {
-                            onDelete();
+                            onDelete(); // Xóa ghi chú khi xác nhận
                             Navigator.pop(context);
                           },
                         ),

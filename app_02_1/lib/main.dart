@@ -20,7 +20,6 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         brightness: Brightness.dark,
       ),
-      themeMode: ThemeMode.system, // Hỗ trợ Dark Mode
       home: NoteListScreen(),
     );
   }

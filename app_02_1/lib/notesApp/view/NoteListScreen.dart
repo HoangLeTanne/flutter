@@ -12,32 +12,36 @@ class NoteListScreen extends StatefulWidget {
 }
 
 class _NoteListScreenState extends State<NoteListScreen> {
-  late Future<List<Note>> _notesFuture;
-  bool _isGridView = false;
-  int? _filterPriority;
-  String _searchQuery = '';
-  final _searchController = TextEditingController();
-  String _sortBy = 'priority';
+  late Future<List<Note>> _notesFuture;  // Future chứa danh sách ghi chú
+  bool _isGridView = false;  // Biến để xác định xem có đang ở chế độ GridView hay không
+  int? _filterPriority;  // Biến để lọc ghi chú theo mức ưu tiên
+  String _searchQuery = '';  // Biến lưu trữ truy vấn tìm kiếm
+  final _searchController = TextEditingController();  // Controller cho TextField tìm kiếm
+  String _sortBy = 'priority';  // Biến để xác định kiểu sắp xếp (theo ưu tiên hoặc thời gian)
 
   @override
   void initState() {
     super.initState();
-    _refreshNotes();
+    _refreshNotes();  // Lấy dữ liệu ghi chú ban đầu
   }
 
   Future<void> _refreshNotes() async {
     setState(() {
       if (_searchQuery.isNotEmpty) {
+        // Nếu có tìm kiếm, lấy ghi chú theo truy vấn tìm kiếm
         _notesFuture = NoteDatabaseHelper.instance.searchNotes(_searchQuery);
       } else if (_filterPriority != null) {
+        // Nếu có lọc theo ưu tiên, lấy ghi chú theo mức ưu tiên
         _notesFuture = NoteDatabaseHelper.instance.getNotesByPriority(_filterPriority!);
       } else {
+        // Nếu không có điều kiện tìm kiếm hoặc lọc, lấy tất cả ghi chú
         _notesFuture = NoteDatabaseHelper.instance.getAllNotes();
       }
     });
   }
 
   List<Note> _sortNotes(List<Note> notes) {
+    // Sắp xếp danh sách ghi chú theo ưu tiên hoặc thời gian
     if (_sortBy == 'priority') {
       return notes..sort((a, b) => b.priority.compareTo(a.priority));
     } else {
@@ -48,43 +52,43 @@ class _NoteListScreenState extends State<NoteListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.grey[100],  // Màu nền cho màn hình
       appBar: AppBar(
         title: const Text('📒 Danh sách ghi chú'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh),  // Nút làm mới
             onPressed: _refreshNotes,
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert),  // Nút menu cho các lựa chọn khác
             onSelected: (value) {
               setState(() {
                 switch (value) {
                   case 'grid':
-                    _isGridView = true;
+                    _isGridView = true;  // Chuyển sang chế độ GridView
                     break;
                   case 'list':
-                    _isGridView = false;
+                    _isGridView = false;  // Chuyển sang chế độ ListView
                     break;
                   case 'priority':
                   case 'time':
-                    _sortBy = value;
+                    _sortBy = value;  // Sắp xếp theo ưu tiên hoặc thời gian
                     break;
                   case 'filter_low':
-                    _filterPriority = 1;
+                    _filterPriority = 1;  // Lọc theo ưu tiên thấp
                     break;
                   case 'filter_medium':
-                    _filterPriority = 2;
+                    _filterPriority = 2;  // Lọc theo ưu tiên trung bình
                     break;
                   case 'filter_high':
-                    _filterPriority = 3;
+                    _filterPriority = 3;  // Lọc theo ưu tiên cao
                     break;
                   case 'filter_none':
-                    _filterPriority = null;
+                    _filterPriority = null;  // Bỏ lọc
                     break;
                 }
-                _refreshNotes();
+                _refreshNotes();  // Làm mới ghi chú sau khi thay đổi
               });
             },
             itemBuilder: (context) => [
@@ -106,19 +110,19 @@ class _NoteListScreenState extends State<NoteListScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
             child: TextField(
-              controller: _searchController,
+              controller: _searchController,  // Controller cho TextField tìm kiếm
               decoration: InputDecoration(
-                labelText: ' Tìm kiếm ghi chú',
+                labelText: ' Tìm kiếm ghi chú',  // Văn bản hướng dẫn
                 filled: true,
                 fillColor: Colors.white,
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),  // Biểu tượng tìm kiếm
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear),
+                  icon: const Icon(Icons.clear),  // Nút xóa tìm kiếm
                   onPressed: () {
                     _searchController.clear();
                     setState(() {
                       _searchQuery = '';
-                      _refreshNotes();
+                      _refreshNotes();  // Làm mới khi xóa tìm kiếm
                     });
                   },
                 ),
@@ -126,8 +130,8 @@ class _NoteListScreenState extends State<NoteListScreen> {
               ),
               onChanged: (value) {
                 setState(() {
-                  _searchQuery = value;
-                  _refreshNotes();
+                  _searchQuery = value;  // Cập nhật truy vấn tìm kiếm khi người dùng gõ
+                  _refreshNotes();  // Làm mới ghi chú theo tìm kiếm
                 });
               },
             ),
@@ -135,18 +139,18 @@ class _NoteListScreenState extends State<NoteListScreen> {
           const SizedBox(height: 8),
           Expanded(
             child: FutureBuilder<List<Note>>(
-              future: _notesFuture,
+              future: _notesFuture,  // Dữ liệu ghi chú từ cơ sở dữ liệu
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());  // Đang tải
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Lỗi: ${snapshot.error}'));
+                  return Center(child: Text('Lỗi: ${snapshot.error}'));  // Nếu có lỗi
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('Không có ghi chú nào.'));
+                  return const Center(child: Text('Không có ghi chú nào.'));  // Nếu không có dữ liệu
                 } else {
-                  final notes = _sortNotes(snapshot.data!);
+                  final notes = _sortNotes(snapshot.data!);  // Sắp xếp ghi chú
                   return _isGridView
-                      ? GridView.builder(
+                      ? GridView.builder(  // Chế độ GridView
                     padding: const EdgeInsets.all(12),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
@@ -178,7 +182,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
                       );
                     },
                   )
-                      : ListView.builder(
+                      : ListView.builder(  // Chế độ ListView
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     itemCount: notes.length,
                     itemBuilder: (context, index) {
@@ -214,11 +218,11 @@ class _NoteListScreenState extends State<NoteListScreen> {
         onPressed: () async {
           final newNote = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const NoteForm()),
+            MaterialPageRoute(builder: (context) => const NoteForm()),  // Mở màn hình tạo ghi chú mới
           );
           if (newNote != null) {
-            await NoteDatabaseHelper.instance.insertNote(newNote);
-            _refreshNotes();
+            await NoteDatabaseHelper.instance.insertNote(newNote);  // Thêm ghi chú mới vào cơ sở dữ liệu
+            _refreshNotes();  // Làm mới danh sách ghi chú
           }
         },
         icon: const Icon(Icons.add),

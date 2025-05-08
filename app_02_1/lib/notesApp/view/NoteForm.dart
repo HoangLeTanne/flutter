@@ -3,7 +3,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:app_02_1/notesApp/model/Note.dart';
 
 class NoteForm extends StatefulWidget {
-  final Note? note;
+  final Note? note; // Lưu thông tin ghi chú nếu có, dùng để chỉnh sửa
 
   const NoteForm({Key? key, this.note}) : super(key: key);
 
@@ -12,18 +12,19 @@ class NoteForm extends StatefulWidget {
 }
 
 class _NoteFormState extends State<NoteForm> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
-  final _tagController = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // Khóa để xác thực form
+  final _titleController = TextEditingController(); // Điều khiển cho tiêu đề
+  final _contentController = TextEditingController(); // Điều khiển cho nội dung
+  final _tagController = TextEditingController(); // Điều khiển cho nhãn
 
-  int _priority = 1;
-  List<String> _tags = [];
-  String? _color;
+  int _priority = 1; // Mặc định mức độ ưu tiên là "Thấp"
+  List<String> _tags = []; // Danh sách các nhãn
+  String? _color; // Lưu màu sắc của ghi chú
 
   @override
   void initState() {
     super.initState();
+    // Nếu có ghi chú (chỉnh sửa), điền thông tin vào các trường
     if (widget.note != null) {
       _titleController.text = widget.note!.title;
       _contentController.text = widget.note!.content;
@@ -35,28 +36,32 @@ class _NoteFormState extends State<NoteForm> {
 
   @override
   void dispose() {
+    // Giải phóng bộ điều khiển khi không sử dụng nữa
     _titleController.dispose();
     _contentController.dispose();
     _tagController.dispose();
     super.dispose();
   }
 
+  // Thêm nhãn mới vào danh sách
   void _addTag() {
     String tag = _tagController.text.trim();
     if (tag.isNotEmpty && !_tags.contains(tag)) {
       setState(() {
         _tags.add(tag);
-        _tagController.clear();
+        _tagController.clear(); // Xóa nội dung trong ô nhập
       });
     }
   }
 
+  // Xóa nhãn khỏi danh sách
   void _removeTag(String tag) {
     setState(() {
       _tags.remove(tag);
     });
   }
 
+  // Chọn màu sắc ghi chú
   void _pickColor() {
     showDialog(
       context: context,
@@ -70,7 +75,7 @@ class _NoteFormState extends State<NoteForm> {
             onColorChanged: (color) {
               setState(() {
                 _color =
-                '#${color.value.toRadixString(16).padLeft(8, '0').substring(2)}';
+                '#${color.value.toRadixString(16).padLeft(8, '0').substring(2)}'; // Chuyển đổi màu sang mã hex
               });
             },
           ),
@@ -78,13 +83,14 @@ class _NoteFormState extends State<NoteForm> {
         actions: [
           TextButton(
             child: const Text('Xong'),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context), // Đóng hộp thoại
           ),
         ],
       ),
     );
   }
 
+  // Xử lý khi người dùng nhấn nút "Thêm" hoặc "Cập nhật"
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       final now = DateTime.now();
@@ -99,17 +105,17 @@ class _NoteFormState extends State<NoteForm> {
         color: _color,
         isCompleted: widget.note?.isCompleted ?? false,
       );
-      Navigator.pop(context, note);
+      Navigator.pop(context, note); // Trả về ghi chú đã thay đổi hoặc mới
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isEditing = widget.note != null;
+    final isEditing = widget.note != null; // Kiểm tra xem là chỉnh sửa hay thêm mới
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Cập nhật ghi chú' : 'Thêm ghi chú mới'),
+        title: Text(isEditing ? 'Cập nhật ghi chú' : 'Thêm ghi chú mới'), // Tiêu đề AppBar
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -126,7 +132,7 @@ class _NoteFormState extends State<NoteForm> {
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) =>
-                value == null || value.isEmpty ? 'Vui lòng nhập tiêu đề' : null,
+                value == null || value.isEmpty ? 'Vui lòng nhập tiêu đề' : null, // Kiểm tra yêu cầu tiêu đề
               ),
               const SizedBox(height: 16),
 
@@ -139,7 +145,7 @@ class _NoteFormState extends State<NoteForm> {
                 ),
                 maxLines: 5,
                 validator: (value) =>
-                value == null || value.isEmpty ? 'Vui lòng nhập nội dung' : null,
+                value == null || value.isEmpty ? 'Vui lòng nhập nội dung' : null, // Kiểm tra yêu cầu nội dung
               ),
               const SizedBox(height: 16),
 
@@ -156,7 +162,7 @@ class _NoteFormState extends State<NoteForm> {
                   DropdownMenuItem(value: 3, child: Text('🔴 Cao')),
                 ],
                 onChanged: (value) {
-                  if (value != null) setState(() => _priority = value);
+                  if (value != null) setState(() => _priority = value); // Cập nhật mức độ ưu tiên
                 },
               ),
               const SizedBox(height: 16),
@@ -171,17 +177,18 @@ class _NoteFormState extends State<NoteForm> {
                         labelText: 'Thêm nhãn',
                         border: OutlineInputBorder(),
                       ),
-                      onSubmitted: (_) => _addTag(),
+                      onSubmitted: (_) => _addTag(), // Thêm nhãn khi nhấn Enter
                     ),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: _addTag,
-                    child: const Text('Thêm'),
+                    child: const Text('Thêm'), // Nút thêm nhãn
                   ),
                 ],
               ),
               const SizedBox(height: 8),
+              // Hiển thị các nhãn đã thêm
               if (_tags.isNotEmpty)
                 Wrap(
                   spacing: 8,
@@ -191,7 +198,7 @@ class _NoteFormState extends State<NoteForm> {
                     label: Text(tag),
                     backgroundColor: Colors.lightBlue.shade50,
                     deleteIcon: const Icon(Icons.close),
-                    onDeleted: () => _removeTag(tag),
+                    onDeleted: () => _removeTag(tag), // Xóa nhãn
                   ))
                       .toList(),
                 ),
@@ -201,7 +208,7 @@ class _NoteFormState extends State<NoteForm> {
               const Text('Màu sắc ghi chú:', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               GestureDetector(
-                onTap: _pickColor,
+                onTap: _pickColor, // Mở dialog chọn màu khi nhấn vào
                 child: Row(
                   children: [
                     Container(
@@ -216,7 +223,7 @@ class _NoteFormState extends State<NoteForm> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Text(_color ?? 'Chưa chọn màu'),
+                    Text(_color ?? 'Chưa chọn màu'), // Hiển thị màu đã chọn
                   ],
                 ),
               ),
@@ -226,7 +233,7 @@ class _NoteFormState extends State<NoteForm> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _submitForm,
+                  onPressed: _submitForm, // Gửi form khi nhấn nút
                   child: Text(isEditing ? 'CẬP NHẬT' : 'THÊM MỚI'),
                 ),
               ),
@@ -237,3 +244,4 @@ class _NoteFormState extends State<NoteForm> {
     );
   }
 }
+

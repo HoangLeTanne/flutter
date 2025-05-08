@@ -53,7 +53,7 @@ class NoteDatabaseHelper {
       },
       {
         'title': 'Mua sắm',
-        'content': 'Mua thực phẩm cho tuần này',
+        'content': 'Mua quần áo cho tuần này',
         'priority': 2,
         'createdAt': DateTime.now().toIso8601String(),
         'modifiedAt': DateTime.now().toIso8601String(),
