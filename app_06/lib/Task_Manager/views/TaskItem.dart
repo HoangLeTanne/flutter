@@ -148,13 +148,13 @@ class TaskItem extends StatelessWidget {
               SizedBox(height: 12),
               // Action Buttons
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   // Complete task
                   IconButton(
                     tooltip: 'Hoàn thành',
                     icon: Icon(
-                      task.completed ? Icons.check_box : Icons.check_box_outline_blank,
+                      task.completed ? Icons.check_box_rounded: Icons.check_box_rounded,
                       color: Colors.green,
                     ),
                     onPressed: () {
